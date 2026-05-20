@@ -1,33 +1,33 @@
 package com.desafio.fastcommerce.domain.entities;
 
-import com.desafio.fastcommerce.domain.enums.Role;
+
+import com.desafio.fastcommerce.domain.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
-@Table(name = "tb_user")
-public class User {
+@Table(name = "tb_orders")
+public class Orders {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String name;
-    private String email;
-    private String passwordHash;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User userId;
 
-    private boolean isActive;
+    private OrderStatus status;
+
+    @Column(precision = 19, scale = 2, nullable = false)
+    private BigDecimal totalAmount;
 
     @CreationTimestamp
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
@@ -37,7 +37,6 @@ public class User {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private Date updatedAt;
 
-    @OneToMany
-    @JoinColumn(name = "order_id")
-    private Orders orders;
+    @OneToMany(mappedBy = "order",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItems> items = new ArrayList<>();
 }
