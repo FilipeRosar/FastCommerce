@@ -18,8 +18,8 @@ public class JwtService {
     @Value("${JWT.SECRET}")
     private String SECRET;
 
-    @Value("${JWT.EXPIRATION}")
-    private long EXPIRATION;
+    private static final long ACCESS_TOKEN_EXPIRATION= 1000*60*15;
+    private static final long REFRESH_TOKEN_EXPIRATION= 1000L*60*60*24*7;
 
 
     public String generateToken(User user){
@@ -27,11 +27,20 @@ public class JwtService {
                 .subject(user.getEmail())
                 .claim("role", user.getRole().name())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(getSigningKey())
                 .compact();
     }
-
+    public String generateRefreshToken(User user){
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .issuedAt(new Date())
+                .expiration(new Date(
+                        System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION
+                ))
+                .signWith(getSigningKey())
+                .compact();
+    }
     public String extractUsername(String token){
         return extractAllClaims(token).getSubject();
     }

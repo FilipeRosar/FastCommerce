@@ -9,7 +9,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -26,7 +28,8 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
+    private String phoneNumber;
+    private String cpf;
     private boolean isActive;
 
     @CreationTimestamp
@@ -38,6 +41,6 @@ public class User {
     private Date updatedAt;
 
     @OneToMany
-    @JoinColumn(name = "order_id")
-    private Orders orders;
+    @JoinColumn(name = "user_id")
+    private List<Orders> orders = new ArrayList<>();
 }
