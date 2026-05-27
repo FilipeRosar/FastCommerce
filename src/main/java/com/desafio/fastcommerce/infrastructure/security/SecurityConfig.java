@@ -15,13 +15,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final JwtFilter _jwtFilter;
-
-    @Autowired
-    private CorsConfigurationSource configurationSource;
+    private final JwtFilter jwtFilter;
 
     public SecurityConfig(JwtFilter jwtFilter) {
-        this._jwtFilter = jwtFilter;
+        this.jwtFilter = jwtFilter;
     }
 
     @Bean
@@ -39,13 +36,14 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/auth/**").permitAll()
+                                "/api/v1/auth/**",
+                                "/api/v1/products/**").permitAll()
 
                         .anyRequest()
                         .authenticated()
                 )
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(_jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }

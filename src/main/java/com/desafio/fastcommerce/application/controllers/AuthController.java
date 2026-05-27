@@ -4,7 +4,7 @@ import com.desafio.fastcommerce.domain.DTOs.AuthDTOs.AuthResponseDto;
 import com.desafio.fastcommerce.domain.DTOs.AuthDTOs.LoginRequestDto;
 import com.desafio.fastcommerce.domain.DTOs.AuthDTOs.RefreshTokenRequestDto;
 import com.desafio.fastcommerce.domain.DTOs.UserDto.CreateUserDto;
-import com.desafio.fastcommerce.service.AuthService;
+import com.desafio.fastcommerce.application.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;

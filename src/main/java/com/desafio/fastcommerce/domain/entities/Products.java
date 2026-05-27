@@ -1,11 +1,15 @@
 package com.desafio.fastcommerce.domain.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,6 +27,12 @@ public class Products {
     private Integer stockQuantity;
     private String category;
     private boolean isActive;
-    private Date createdAt;
-    private Date updatedAt;
+
+    @CreationTimestamp
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    private LocalDateTime updatedAt;
 }

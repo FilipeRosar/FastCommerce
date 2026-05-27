@@ -1,4 +1,4 @@
-package com.desafio.fastcommerce.service;
+package com.desafio.fastcommerce.application.service;
 
 import com.desafio.fastcommerce.domain.DTOs.UserDto.CreateUserDto;
 import com.desafio.fastcommerce.domain.DTOs.UserDto.UpdateUserDto;
@@ -22,21 +22,7 @@ public class UserService {
         this._userRepository = _userRepository;
         this.confi = confi;
     }
-
-    public UUID createUser (CreateUserDto dto){
-        var passwordEncoder = confi.encoder();
-
-        if(_userRepository.getUserByEmail(dto.email()).isPresent()){
-            throw new CustomException("Email já existente");
-        }
-        User user = new User();
-        user.setName(dto.name());
-        user.setEmail(dto.email());
-        user.setRole(Role.COSTUMER);
-        user.setPasswordHash(passwordEncoder.encode(dto.passwordHash()));
-
-        return _userRepository.save(user).getId();
-    }
+    
     public Optional<UserResponseDto> getUserById(UUID id){
         return _userRepository.findById(id)
                 .map(this::toDto);

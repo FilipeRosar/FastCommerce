@@ -1,4 +1,4 @@
-package com.desafio.fastcommerce.service;
+package com.desafio.fastcommerce.application.service;
 
 
 import com.desafio.fastcommerce.domain.DTOs.AuthDTOs.AuthResponseDto;
@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -37,7 +38,9 @@ public class AuthService {
         user.setEmail(dto.email());
         user.setCpf(dto.cpf());
         user.setRole(Role.COSTUMER);
-
+        user.setCreatedAt(LocalDateTime.now());
+        user.setPhoneNumber(dto.phoneNumber());
+        user.setActive(true);
         user.setPasswordHash(
                 passwordEncoder.encode(dto.passwordHash())
         );

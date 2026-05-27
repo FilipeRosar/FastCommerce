@@ -15,6 +15,7 @@ public record CreateUserDto(
                 message = "A senha deve ter no minimo 8 caracteres, com letras e numeros."
         )
         String passwordHash,
-        String cpf
+        String cpf,
+        String phoneNumber
                             ) {
 }
