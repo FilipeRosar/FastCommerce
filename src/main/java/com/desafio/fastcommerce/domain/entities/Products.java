@@ -26,6 +26,7 @@ public class Products {
     private BigDecimal price;
     private Integer stockQuantity;
     private String category;
+    @Column(name = "is_active")
     private boolean isActive;
 
     @CreationTimestamp

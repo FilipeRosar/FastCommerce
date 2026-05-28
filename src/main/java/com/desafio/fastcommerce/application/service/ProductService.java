@@ -27,7 +27,6 @@ public class ProductService {
         this._productRepository = _productRepository;
     }
 
-
     @CacheEvict(value = "products", allEntries = true)
     public UUID createProduct(CreateProdutsDto dto){
 
@@ -48,19 +47,35 @@ public class ProductService {
 
         return _productRepository.save(products).getId();
     }
+
     public ProductResponseDto getProdutById(UUID id){
         Products product = _productRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Produto não encontrado"));
                 return toDto(product);
     }
     @Cacheable(value = "products")
-    public Page<ProductResponseDto> getProducts(Pageable pageble) {
-        return _productRepository.findByActiveTrue(pageble)
-                .map(this::toDto);
+    public Page<ProductResponseDto> getProducts(String name,
+                                                String category,
+                                                BigDecimal minPrice,
+                                                BigDecimal maxPrice,
+                                                Pageable pageable) {
+        Page<Products> products;
+
+        if (name != null){
+            products = _productRepository.findByNameContainingIgnoreCaseAndIsActiveTrue(name, pageable);
+        } else if (category != null){
+            products = _productRepository.findByCategoryContainingIgnoreCaseAndIsActiveTrue(category, pageable);
+        } else if (minPrice != null && maxPrice != null){
+            products = _productRepository.findByPriceBetweenAndIsActiveTrue(minPrice, maxPrice, pageable);
+        } else {
+            products = _productRepository.findByIsActiveTrue(pageable);
+        }
+
+        return products.map(this::toDto);
     }
     @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(UUID id){
-        Products products = _productRepository.findByIdAndActiveTrue(id)
+        Products products = _productRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new CustomException("Produto não encontrado!"));
 
         products.setActive(false);
