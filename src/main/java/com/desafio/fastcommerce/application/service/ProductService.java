@@ -40,6 +40,7 @@ public class ProductService {
         Products products = new Products();
         products.setName(dto.nome());
         products.setCategory(dto.categoria());
+        products.setDescription(dto.descricao());
         products.setCreatedAt(LocalDateTime.now());
         products.setPrice(dto.preco());
         products.setStockQuantity(dto.estoque());

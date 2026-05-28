@@ -4,6 +4,8 @@ package com.desafio.fastcommerce.domain.entities;
 import com.desafio.fastcommerce.domain.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,14 +18,18 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "tb_orders")
+@Getter
+@Setter
 public class Orders {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User userId;
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @Column(precision = 19, scale = 2, nullable = false)
@@ -35,8 +41,13 @@ public class Orders {
 
     @UpdateTimestamp
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItems> items = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

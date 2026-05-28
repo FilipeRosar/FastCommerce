@@ -28,4 +28,6 @@ public class OrderItems {
 
     @Column(name = "unit_price", nullable = false)
     private BigDecimal unitPrice;
+
+    private BigDecimal subTotal;
 }
