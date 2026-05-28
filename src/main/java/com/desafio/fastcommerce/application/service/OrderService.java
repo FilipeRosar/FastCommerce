@@ -6,11 +6,14 @@ import com.desafio.fastcommerce.domain.DTOs.ordersDTOs.OrderItemRequestDTO;
 import com.desafio.fastcommerce.domain.entities.OrderItems;
 import com.desafio.fastcommerce.domain.entities.Orders;
 import com.desafio.fastcommerce.domain.entities.Products;
+import com.desafio.fastcommerce.domain.entities.User;
 import com.desafio.fastcommerce.domain.enums.OrderStatus;
 import com.desafio.fastcommerce.domain.repository.OrderRepository;
 import com.desafio.fastcommerce.domain.repository.ProductsRepository;
+import com.desafio.fastcommerce.domain.repository.UserRepository;
 import com.desafio.fastcommerce.infrastructure.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductsRepository productsRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public Orders createOrder(CreateOrderRequestDTO dto){
@@ -62,6 +65,8 @@ public class OrderService {
             orderItems.setUnitPrice(products.getPrice());
             orderItems.setSubTotal(subtotal);
 
+            User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            order.setUserId(currentUser);
             order.getItems().add(orderItems);
             total = total.add(subtotal);
         }
