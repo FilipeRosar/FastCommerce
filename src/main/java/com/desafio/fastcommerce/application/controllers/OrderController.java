@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -31,21 +32,25 @@ public class OrderController {
         OrderResponseDTO response = orderService.getOrderById(id);
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("hasAnyRole('OPERATOR', 'ADMIN')")
     @PutMapping("/{id}/confirm")
     public ResponseEntity<OrderResponseDTO> confirmOrder(@PathVariable UUID id){
         OrderResponseDTO response = orderService.confirmOrder(id);
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("hasAnyRole('OPERATOR', 'ADMIN')")
     @PutMapping("/{id}/ship")
     public ResponseEntity<OrderResponseDTO> shipOrder(@PathVariable UUID id){
         OrderResponseDTO response = orderService.shipOrder(id);
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("hasAnyRole('OPERATOR', 'ADMIN')")
     @PutMapping("/{id}/deliver")
     public ResponseEntity<OrderResponseDTO> deliverOrder(@PathVariable UUID id){
         OrderResponseDTO response = orderService.deliverOrder(id);
         return ResponseEntity.ok(response);
     }
+
     @PutMapping("/{id}/cancel")
     public ResponseEntity<OrderResponseDTO> cancelOrder(@PathVariable UUID id){
         OrderResponseDTO response = orderService.cancelOrder(id);

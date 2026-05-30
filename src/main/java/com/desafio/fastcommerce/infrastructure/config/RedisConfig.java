@@ -10,6 +10,8 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableCaching
@@ -31,9 +33,21 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, RedisCacheConfiguration cacheConfiguration) {
-        return RedisCacheManager.builder(redisConnectionFactory)
-                .cacheDefaults(cacheConfiguration)
+    public RedisCacheManager cacheManager(
+            RedisConnectionFactory connectionFactory
+    ) {
+
+        Map<String, RedisCacheConfiguration> cacheConfigurations =
+                new HashMap<>();
+
+        cacheConfigurations.put(
+                "orders-dashboard",
+                RedisCacheConfiguration.defaultCacheConfig()
+                        .entryTtl(Duration.ofMinutes(10))
+        );
+
+        return RedisCacheManager.builder(connectionFactory)
+                .withInitialCacheConfigurations(cacheConfigurations)
                 .build();
     }
 }
