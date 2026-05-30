@@ -6,11 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record OrderItemRequestDTO(
-        @NotNull
+        @NotNull(message = "O Id do produto é obrigatório")
         UUID productId,
 
-        @NotNull
-        @Min(1)
+        @NotNull(message = "A quantidade é obrigatória")
+        @Min(value = 1, message = "A quantidade minima permitida é 1")
         Integer quantity
 ) {
 }

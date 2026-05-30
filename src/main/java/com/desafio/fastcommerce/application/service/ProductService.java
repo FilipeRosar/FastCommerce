@@ -107,7 +107,8 @@ public class ProductService {
     }
     private ProductResponseDto toDto(Products products){
         return new ProductResponseDto(
-            products.getName(),
+                products.getId(),
+                products.getName(),
                 products.getPrice(),
                 products.getCategory(),
                 products.getCreatedAt()

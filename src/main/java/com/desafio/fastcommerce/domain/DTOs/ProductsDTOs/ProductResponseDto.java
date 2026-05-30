@@ -6,8 +6,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record ProductResponseDto(
+        UUID id,
         String nome,
         BigDecimal preco,
         String categoria,

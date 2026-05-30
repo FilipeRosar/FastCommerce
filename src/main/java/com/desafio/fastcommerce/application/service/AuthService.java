@@ -16,6 +16,7 @@ import com.desafio.fastcommerce.infrastructure.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -46,6 +47,7 @@ public class AuthService {
         );
         return userRepository.save(user).getId();
     }
+    @Transactional
     public AuthResponseDto login(LoginRequestDto dto){
         User user = userRepository.getUserByEmail(dto.email())
                 .orElseThrow(() -> new CustomException("Email ou senha inválidos"));
@@ -57,10 +59,13 @@ public class AuthService {
         if (!passwordMatches) {
             throw new CustomException("Email ou senha inválidos");
         }
+        refreshTokenRepository.findByUser(user).ifPresent(refreshTokenRepository::delete);
+        refreshTokenRepository.flush();
+
         String accessToken = jwtService.generateToken(user);
         String refreshTokenValues = jwtService.generateRefreshToken(user);
-        RefreshToken refreshToken = new RefreshToken();
 
+        RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(refreshTokenValues);
         refreshToken.setUser(user);
         refreshToken.setRevoked(false);
@@ -79,21 +84,32 @@ public class AuthService {
         );
     }
     public AuthResponseDto refreshToken(RefreshTokenRequestDto dto){
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(dto.refreshToken())
+        RefreshToken oldRefreshToken = refreshTokenRepository.findByToken(dto.refreshToken())
                 .orElseThrow(() -> new CustomException("Refresh token invalido"));
-        if (refreshToken.isRevoked()){
+        if (oldRefreshToken.isRevoked()){
             throw new CustomException("Refresh token revogado");
         }
-        if (refreshToken.getExpiration().isBefore(Instant.now())){
+        if (oldRefreshToken.getExpiration().isBefore(Instant.now())){
             throw new CustomException("Refresh token expirada");
         }
-        User user = refreshToken.getUser();
+        User user = oldRefreshToken.getUser();
+
+        refreshTokenRepository.delete(oldRefreshToken);
+        refreshTokenRepository.flush();
 
         String newAccessToken = jwtService.generateToken(user);
+        String newRefreshTokenValues = jwtService.generateRefreshToken(user);
+
+        RefreshToken newRefreshToken = new RefreshToken();
+        newRefreshToken.setToken(newRefreshTokenValues);
+        newRefreshToken.setUser(user);
+        newRefreshToken.setRevoked(false);
+        newRefreshToken.setExpiration(Instant.now().plusSeconds(604800));
+        refreshTokenRepository.save(newRefreshToken);
 
         return new AuthResponseDto(
                 newAccessToken,
-                refreshToken.getToken(),
+                newRefreshTokenValues,
                 900L,
                 user.getId(),
                 user.getName(),

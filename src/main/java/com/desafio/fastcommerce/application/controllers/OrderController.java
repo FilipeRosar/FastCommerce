@@ -10,10 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -24,7 +23,32 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDTO> createOrder(@Valid @RequestBody CreateOrderRequestDTO createOrderRequestDTO) {
-        Orders order = orderService.createOrder(createOrderRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(OrderResponseDTO.fromEntity(order));
+        OrderResponseDTO responseDTO = orderService.createOrder(createOrderRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponseDTO> getOrder(@PathVariable UUID id){
+        OrderResponseDTO response = orderService.getOrderById(id);
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/{id}/confirm")
+    public ResponseEntity<OrderResponseDTO> confirmOrder(@PathVariable UUID id){
+        OrderResponseDTO response = orderService.confirmOrder(id);
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/{id}/ship")
+    public ResponseEntity<OrderResponseDTO> shipOrder(@PathVariable UUID id){
+        OrderResponseDTO response = orderService.shipOrder(id);
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/{id}/deliver")
+    public ResponseEntity<OrderResponseDTO> deliverOrder(@PathVariable UUID id){
+        OrderResponseDTO response = orderService.deliverOrder(id);
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<OrderResponseDTO> cancelOrder(@PathVariable UUID id){
+        OrderResponseDTO response = orderService.cancelOrder(id);
+        return ResponseEntity.ok(response);
     }
 }

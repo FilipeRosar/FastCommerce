@@ -16,17 +16,21 @@ public record OrderResponseDTO(
         List<OrderItemResponseDTO> items
 ) {
     public static OrderResponseDTO fromEntity(Orders order) {
-
+        List<OrderItemResponseDTO> itemsDto = order.getItems().stream()
+                .map(item -> new OrderItemResponseDTO(
+                        item.getId(),
+                        item.getProduct().getName(),
+                        item.getQuantity(),
+                        item.getUnitPrice(),
+                        item.getSubTotal()
+                ))
+                .toList();
         return new OrderResponseDTO(
                 order.getId(),
                 order.getTotalAmount(),
                 order.getStatus(),
                 order.getCreatedAt(),
-
-                order.getItems()
-                        .stream()
-                        .map(OrderItemResponseDTO::fromEntity)
-                        .toList()
+                itemsDto
         );
     }
 }

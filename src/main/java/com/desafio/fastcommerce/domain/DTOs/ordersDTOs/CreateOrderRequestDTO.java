@@ -7,7 +7,8 @@ import java.util.List;
 
 public record CreateOrderRequestDTO(
 
-        @NotEmpty
-        List<@Valid OrderItemRequestDTO> items
+        @NotEmpty(message = "A lista de itens não pode estar vazia")
+        @Valid
+        List<OrderItemRequestDTO> items
 ) {
 }
