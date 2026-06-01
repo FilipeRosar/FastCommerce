@@ -21,10 +21,10 @@ import java.util.UUID;
 
 @Service
 public class ProductService {
-    private final ProductsRepository _productRepository;
+    private final ProductsRepository productRepository;
 
-    public ProductService(ProductsRepository _productRepository) {
-        this._productRepository = _productRepository;
+    public ProductService(ProductsRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @CacheEvict(value = "products", allEntries = true)
@@ -46,11 +46,11 @@ public class ProductService {
         products.setStockQuantity(dto.estoque());
         products.setActive(true);
 
-        return _productRepository.save(products).getId();
+        return productRepository.save(products).getId();
     }
 
     public ProductResponseDto getProdutById(UUID id){
-        Products product = _productRepository.findById(id)
+        Products product = productRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Produto não encontrado"));
                 return toDto(product);
     }
@@ -63,29 +63,29 @@ public class ProductService {
         Page<Products> products;
 
         if (name != null){
-            products = _productRepository.findByNameContainingIgnoreCaseAndIsActiveTrue(name, pageable);
+            products = productRepository.findByNameContainingIgnoreCaseAndIsActiveTrue(name, pageable);
         } else if (category != null){
-            products = _productRepository.findByCategoryContainingIgnoreCaseAndIsActiveTrue(category, pageable);
+            products = productRepository.findByCategoryContainingIgnoreCaseAndIsActiveTrue(category, pageable);
         } else if (minPrice != null && maxPrice != null){
-            products = _productRepository.findByPriceBetweenAndIsActiveTrue(minPrice, maxPrice, pageable);
+            products = productRepository.findByPriceBetweenAndIsActiveTrue(minPrice, maxPrice, pageable);
         } else {
-            products = _productRepository.findByIsActiveTrue(pageable);
+            products = productRepository.findByIsActiveTrue(pageable);
         }
 
         return products.map(this::toDto);
     }
     @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(UUID id){
-        Products products = _productRepository.findByIdAndIsActiveTrue(id)
+        Products products = productRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new CustomException("Produto não encontrado!"));
 
         products.setActive(false);
         products.setUpdatedAt(LocalDateTime.now());
-        _productRepository.save(products);
+        productRepository.save(products);
     }
     @CacheEvict(value = "products", allEntries = true)
     public ProductResponseDto updateProduct(UUID id, UpdateProductsDto dto){
-        Products products = _productRepository.findById(id)
+        Products products = productRepository.findById(id)
                 .orElseThrow(() -> new CustomException("Produto não encontrado"));
 
         if (dto.preco() != null && dto.preco().compareTo(BigDecimal.ZERO) <= 0){
@@ -101,7 +101,7 @@ public class ProductService {
         products.setStockQuantity(dto.estoque());
         products.setUpdatedAt(LocalDateTime.now());
 
-        Products updateProduct = _productRepository.save(products);
+        Products updateProduct = productRepository.save(products);
         return toDto(updateProduct);
 
     }

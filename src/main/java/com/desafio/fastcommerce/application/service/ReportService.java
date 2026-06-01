@@ -20,7 +20,7 @@ public class ReportService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
-    public OrdersDashboardResponseDTO getDashboard(LocalDateTime startDate, LocalDateTime endDate) {
+    public OrdersDashboardResponseDTO getDashboard( LocalDateTime startDate, LocalDateTime endDate) {
         var ordersByStatus =
                 orderRepository.countOrdersByStatus(startDate, endDate);
 
