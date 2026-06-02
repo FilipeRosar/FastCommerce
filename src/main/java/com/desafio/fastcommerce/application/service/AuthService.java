@@ -14,6 +14,7 @@ import com.desafio.fastcommerce.infrastructure.exception.CustomException;
 import com.desafio.fastcommerce.infrastructure.security.SecurityConfig;
 import com.desafio.fastcommerce.infrastructure.service.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,5 +123,10 @@ public class AuthService {
                 .orElseThrow(() -> new CustomException("Refresh token invalido"));
         refreshToken.setRevoked(true);
         refreshTokenRepository.save(refreshToken);
+    }
+    public User getAuthenticatedUser(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.getUserByEmail(email)
+                .orElseThrow(() -> new CustomException("Usuário não autenticado"));
     }
 }
