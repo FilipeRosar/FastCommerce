@@ -1,5 +1,7 @@
 package com.desafio.fastcommerce.domain.DTOs.ProductsDTOs;
 
+import com.desafio.fastcommerce.domain.enums.Category;
+
 import java.math.BigDecimal;
 
 public record UpdateProductsDto(
@@ -7,6 +9,6 @@ public record UpdateProductsDto(
         String descricao,
         BigDecimal preco,
         Integer estoque,
-        String categoria
+        Category categoria
 ) {
 }

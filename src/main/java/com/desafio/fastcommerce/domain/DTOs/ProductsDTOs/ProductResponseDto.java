@@ -1,5 +1,6 @@
 package com.desafio.fastcommerce.domain.DTOs.ProductsDTOs;
 
+import com.desafio.fastcommerce.domain.enums.Category;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -12,7 +13,7 @@ public record ProductResponseDto(
         UUID id,
         String nome,
         BigDecimal preco,
-        String categoria,
+        Category categoria,
         @CreationTimestamp
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
         LocalDateTime createdAt

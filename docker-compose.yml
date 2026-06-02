@@ -13,6 +13,8 @@ services:
       - "${POSTGRES_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fastcommerce-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-root} -d ${POSTGRES_DB:-spring_db}"]
       interval: 5s
@@ -27,12 +29,16 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-root}
     ports:
       - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - fastcommerce-network
 
   redis:
     image: docker.io/redis:7-alpine
     container_name: redis_cache
     ports:
       - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - fastcommerce-network
     volumes:
       - redis_data:/data
     healthcheck:
@@ -50,6 +56,8 @@ services:
     ports:
       - "${RABBITMQ_AMQP_PORT:-5672}:5672"
       - "${RABBITMQ_MGMT_PORT:-15672}:15672"
+    networks:
+      - fastcommerce-network
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq:Z
     healthcheck:
@@ -58,17 +66,37 @@ services:
       timeout: 5s
       retries: 5
 
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: azurite_storage
+    command: azurite-blob --blobHost 0.0.0.0
+    ports:
+      - "${AZURITE_PORT:-10000}:10000"
+    volumes:
+      - azurite_data:/data
+    networks:
+      - fastcommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 10000 || exit 1"] # Garante que o Azurite está pronto para receber conexões
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
   app:
     build: .
     container_name: spring_boot_app
     ports:
       - "${APP_PORT:-8080}:8080"
+    networks:
+      - fastcommerce-network
     depends_on:
       postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      azurite:
         condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-spring_db}
@@ -80,8 +108,14 @@ services:
       SPRING_RABBITMQ_PORT: ${RABBITMQ_AMQP_PORT:-5672}
       SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
       SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      AZURE_STORAGE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;
 
 volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
+  azurite_data:
+
+networks:
+  fastcommerce-network:
+    driver: bridge

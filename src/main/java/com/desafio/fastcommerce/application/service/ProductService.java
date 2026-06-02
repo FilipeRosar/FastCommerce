@@ -6,11 +6,13 @@ import com.desafio.fastcommerce.domain.DTOs.ProductsDTOs.UpdateProductsDto;
 import com.desafio.fastcommerce.domain.entities.Products;
 import com.desafio.fastcommerce.domain.repository.ProductsRepository;
 import com.desafio.fastcommerce.infrastructure.exception.CustomException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,15 +22,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
     private final ProductsRepository productRepository;
-
-    public ProductService(ProductsRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+    private final ImageUploadService imageUploadService;
 
     @CacheEvict(value = "products", allEntries = true)
-    public UUID createProduct(CreateProdutsDto dto){
+    public UUID createProduct(CreateProdutsDto dto, MultipartFile imageFile){
 
         if(dto.preco() == null || dto.preco().compareTo(BigDecimal.ZERO) <= 0){
             throw new CustomException("Produto deve ser maior que zero");
@@ -36,11 +36,12 @@ public class ProductService {
         if (dto.estoque() < 0) {
             throw new CustomException("O estoque do produto deve ser maior que zero");
         }
-
+        String urlInAzurite = imageUploadService.uploadProductImage(imageFile);
         Products products = new Products();
         products.setName(dto.nome());
         products.setCategory(dto.categoria());
         products.setDescription(dto.descricao());
+        products.setImageUrl(urlInAzurite);
         products.setCreatedAt(LocalDateTime.now());
         products.setPrice(dto.preco());
         products.setStockQuantity(dto.estoque());

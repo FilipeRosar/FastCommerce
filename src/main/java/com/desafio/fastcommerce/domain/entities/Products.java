@@ -1,6 +1,7 @@
 package com.desafio.fastcommerce.domain.entities;
 
 
+import com.desafio.fastcommerce.domain.enums.Category;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,10 +26,13 @@ public class Products {
     private String description;
     private BigDecimal price;
     private Integer stockQuantity;
-    private String category;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
     @Column(name = "is_active")
     private boolean isActive;
 
+    private String imageUrl;
     @CreationTimestamp
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime createdAt;

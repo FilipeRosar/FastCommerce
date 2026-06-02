@@ -1,5 +1,6 @@
 package com.desafio.fastcommerce.domain.DTOs.ProductsDTOs;
 
+import com.desafio.fastcommerce.domain.enums.Category;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
@@ -12,6 +13,6 @@ public record CreateProdutsDto(
         BigDecimal preco,
         @NotNull
         Integer estoque,
-        String categoria
+        Category categoria
 ) {
 }
