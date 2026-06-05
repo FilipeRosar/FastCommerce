@@ -29,9 +29,12 @@ public class Products {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category;
+    private
     @Column(name = "is_active")
     private boolean isActive;
-
+    
+    private Double averageRating = 5.0;
+    private Integer totalRatings = 0;
     private String imageUrl;
     @CreationTimestamp
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")

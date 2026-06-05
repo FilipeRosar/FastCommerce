@@ -112,6 +112,7 @@ public class ProductService {
                 products.getName(),
                 products.getPrice(),
                 products.getCategory(),
+                products.getDescription(),
                 products.getCreatedAt()
         );
     }

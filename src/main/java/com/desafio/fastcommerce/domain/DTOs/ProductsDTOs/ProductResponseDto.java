@@ -14,6 +14,10 @@ public record ProductResponseDto(
         String nome,
         BigDecimal preco,
         Category categoria,
+        String descricao,
+        Double averageRating,
+        Long totalRatings,
+
         @CreationTimestamp
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
         LocalDateTime createdAt
