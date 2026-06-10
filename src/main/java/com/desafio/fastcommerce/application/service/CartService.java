@@ -15,6 +15,7 @@ import com.desafio.fastcommerce.domain.repository.CartRepository;
 import com.desafio.fastcommerce.domain.repository.ProductsRepository;
 import com.desafio.fastcommerce.infrastructure.exception.CustomException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,8 @@ public class CartService {
     private final OrderService orderService;
 
     @Transactional
-    @Cacheable(value = "cart", key = "#user.id")
+    @CacheEvict(value = "cart",
+                key = "@cacheKey.currentUser()")
     public CartResponseDTO addItem(AddItemCartDTO dto){
         User user = authService.getAuthenticatedUser();
 
@@ -48,9 +50,19 @@ public class CartService {
                 .filter(i -> i.getProduct().getId()
                         .equals(products.getId())).findFirst();
         if (existingItem.isPresent()) {
-            existingItem.get().setQuantity(existingItem.get().getQuantity() + dto.quantity());
+            int newQuantity = existingItem.get().getQuantity() + dto.quantity();
+            if (newQuantity > products.getStockQuantity()){
+                throw new CustomException("Quantidade maior que o estoque disponivel");
+            }
+            existingItem.get().setQuantity(newQuantity);
         } else{
             CartItem item = new CartItem();
+            if(dto.quantity() <= 0){
+                throw new CustomException("Quantidade invalida");
+            }
+            if (products.getStockQuantity() < dto.quantity()) {
+                throw new CustomException("Estoque insuficiente");
+            }
             item.setCart(cart);
             item.setProduct(products);
             item.setQuantity(dto.quantity());
@@ -61,6 +73,10 @@ public class CartService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = "cart",
+            key = "@cacheKey.currentUser()"
+    )
     public void removeItem(UUID productId){
         User user = authService.getAuthenticatedUser();
         Cart cart = getOrCreateCart(user);
@@ -73,6 +89,10 @@ public class CartService {
     }
 
     @Transactional
+    @CacheEvict(
+            value = "cart",
+            key = "@cacheKey.currentUser()"
+    )
     public OrderResponseDTO checkout(){
         User user = authService.getAuthenticatedUser();
         Cart cart = cartRepository.findByUser(user)
@@ -95,6 +115,8 @@ public class CartService {
 
         return order;
     }
+    @Cacheable(value = "cart",
+                key = "@cacheKey.currentUser()")
     public CartResponseDTO getCart(){
         User user = authService.getAuthenticatedUser();
 

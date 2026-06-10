@@ -113,6 +113,8 @@ public class ProductService {
                 products.getPrice(),
                 products.getCategory(),
                 products.getDescription(),
+                products.getAverageRating(),
+                products.getTotalRatings(),
                 products.getCreatedAt()
         );
     }

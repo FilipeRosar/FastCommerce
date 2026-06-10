@@ -16,7 +16,7 @@ public record ProductResponseDto(
         Category categoria,
         String descricao,
         Double averageRating,
-        Long totalRatings,
+        Integer totalRatings,
 
         @CreationTimestamp
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm")

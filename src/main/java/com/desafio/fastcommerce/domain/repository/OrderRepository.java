@@ -39,4 +39,13 @@ public interface OrderRepository extends JpaRepository<Orders, UUID> {
     BigDecimal getTotalRevenue(@Param("startDate") LocalDateTime statDate,
                                @Param("endDate") LocalDateTime endDate
     );
+    @Query("""
+    SELECT COUNT(o) > 0 
+    FROM Orders o 
+    JOIN o.items oi 
+    WHERE o.userId.id = :userId
+    AND oi.product.id = :productId
+    AND o.status = com.desafio.fastcommerce.domain.enums.OrderStatus.DELIVERED
+    """)
+    boolean existsPurchaseProduct(@Param("userId") UUID userId, @Param("productId") UUID productId);
 }

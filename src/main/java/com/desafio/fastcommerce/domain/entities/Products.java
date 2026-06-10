@@ -11,7 +11,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,12 +31,14 @@ public class Products {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category;
-    private
+
     @Column(name = "is_active")
     private boolean isActive;
-    
-    private Double averageRating = 5.0;
-    private Integer totalRatings = 0;
+
+    @Column(nullable = false)
+    private Double averageRating;
+    @Column(nullable = false)
+    private Integer totalRatings;
     private String imageUrl;
     @CreationTimestamp
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
@@ -43,4 +47,7 @@ public class Products {
     @UpdateTimestamp
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductReview> reviews = new ArrayList<>();
 }
